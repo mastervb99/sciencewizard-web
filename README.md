@@ -1,70 +1,125 @@
 # ScienceWizard Web Frontend
 
-Phase I static frontend for ScienceWizard - appearance mockup for stakeholder review.
+**Status:** Phase I Complete - Awaiting stakeholder feedback from Omri and Bar
 
-## Phase I Scope
+**Live URL:** https://sciencewizard.onrender.com (free tier - 15-30s cold start after inactivity)
 
-This deployment shows the visual design only. No backend functionality is implemented.
+**GitHub:** https://github.com/mastervb99/sciencewizard-web
 
-**What works:**
+## Current State (December 2025)
+
+Phase I static mockup deployed. Shows visual design only - no backend functionality.
+
+### What's Live
 - Landing page with upload UI mockup
-- Login/signup form appearance
-- Feature cards display
-- Basic interactions (tab switching, button clicks show alerts)
+- Login/signup form appearance (non-functional)
+- Feature cards (Manuscripts, Stats, Figures, Export)
+- About page with founder bios (Omri CEO, Vafa CTO)
 
-**What does NOT work (Phase II):**
+### What's NOT Implemented Yet
 - Actual file uploads
 - Authentication
 - Report generation
 - Downloads
+- Section-by-section review flow
 
-## Local Development
+## How to Modify
 
+### Quick Edits (HTML/CSS only)
 ```bash
-# Install dependencies
-pip install -r requirements.txt
+cd /Users/vafabayat/Dropbox/Financial/0ScienceWizard/sciencewizard_web
 
-# Run server
+# Edit files
+# - static/index.html     → Landing page
+# - static/about.html     → About/founders page
+# - static/css/style.css  → All styling
+# - static/js/app.js      → Basic interactions
+
+# Test locally
+source venv/bin/activate
 python server.py
-
 # Visit http://localhost:8000
+
+# Deploy
+git add -A && git commit -m "Description of changes" && git push
+# Render auto-deploys from GitHub (1-2 min)
 ```
 
-## Deploy to Render
-
-1. Push this folder to a GitHub repository
-2. Go to render.com and create a New Web Service
-3. Connect your GitHub repo
-4. Render will auto-detect `render.yaml` configuration
-5. Click Deploy
-
-**Note:** Free tier has 15-30 second cold starts after inactivity.
+### Adding New Pages
+1. Create `static/newpage.html`
+2. Add route in `server.py`:
+   ```python
+   @app.get("/newpage.html")
+   async def newpage():
+       return FileResponse(STATIC_DIR / "newpage.html")
+   ```
+3. Commit and push
 
 ## Project Structure
 
 ```
 sciencewizard_web/
-├── server.py           # FastAPI server (minimal)
-├── render.yaml         # Render deployment config
-├── requirements.txt    # Python dependencies
+├── server.py              # FastAPI server
+├── render.yaml            # Render deployment config
+├── requirements.txt       # fastapi, uvicorn
 ├── .gitignore
-├── README.md
+├── README.md              # This file
+├── venv/                  # Local virtual environment (not in git)
 └── static/
-    ├── index.html      # Landing page
+    ├── index.html         # Landing page
+    ├── about.html         # Founders page
     ├── css/
-    │   └── style.css   # All styles
+    │   └── style.css      # All styles (~700 lines)
     └── js/
-        └── app.js      # Basic interactions
+        └── app.js         # Tab switching, drag/drop visuals
 ```
 
-## Next Phases
+## Deployment Details
 
-**Phase II:** Add authentication endpoints, file upload handling
-**Phase III:** Connect to ScienceWizard agents for report generation
-**Phase IV:** Section review and regeneration workflow
-**Phase V:** Token tracking and billing integration
+### Render Configuration
+- **Service:** Web Service (Python)
+- **Plan:** Free ($0/month)
+- **Build:** `pip install -r requirements.txt`
+- **Start:** `python server.py`
+- **Auto-deploy:** Yes, from GitHub main branch
 
-## Contact
+### Free Tier Limitations
+- Spins down after 15 min inactivity
+- Cold start: 15-30 seconds
+- 512MB RAM, 0.1 CPU
+- For demos: warn users about initial load time
+- Upgrade to Starter ($7/mo) for always-on
 
-PlanetMed Clinical Research Consultancy
-omri@planetmed.pro
+## Next Steps (Pending Feedback)
+
+### Phase II: Authentication
+- Add `/api/auth/register` and `/api/auth/login` endpoints
+- JWT token handling
+- User session persistence
+
+### Phase III: File Upload
+- Actual file upload to server
+- File validation (type, size)
+- Temporary storage
+
+### Phase IV: Report Generation
+- Connect to ScienceWizard agents
+- Background job processing
+- Progress polling
+
+### Phase V: Review Flow
+- Section-by-section approval (per Omri's design)
+- Feedback collection
+- Regeneration with feedback
+
+## Key Contacts
+
+- **Omri Weisman** (CEO) - Product/design decisions
+- **Bar** - Stakeholder feedback
+- **Vafa Bayat** (CTO) - Technical implementation
+
+## Related Documents
+
+- `/Users/vafabayat/Dropbox/Financial/0ScienceWizard/ScienceWizard_Web_Deployment_Plan.md` - Full architecture plan
+- `/Users/vafabayat/Dropbox/Financial/0ScienceWizard/Startup design Omri.docx` - Original UI spec from Omri
+- `/Users/vafabayat/Dropbox/Financial/0ScienceWizard/Presentations/` - Preseed deck and materials
