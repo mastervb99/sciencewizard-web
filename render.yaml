@@ -1,0 +1,15 @@
+# ScienceWizard - Phase I Static Frontend
+# Render deployment configuration
+
+services:
+  - type: web
+    name: sciencewizard
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python server.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11"
+      - key: PORT
+        value: "8000"
