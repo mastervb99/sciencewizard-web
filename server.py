@@ -33,6 +33,12 @@ async def root():
     return FileResponse(STATIC_DIR / "index.html")
 
 
+@app.get("/about.html")
+async def about():
+    """Serve the about page."""
+    return FileResponse(STATIC_DIR / "about.html")
+
+
 @app.get("/health")
 async def health():
     """Health check endpoint for Render."""

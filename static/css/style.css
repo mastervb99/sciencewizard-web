@@ -541,6 +541,164 @@ body {
     color: var(--primary);
 }
 
+/* About Page */
+.about-hero {
+    text-align: center;
+    padding: 60px 0 40px;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.about-hero h1 {
+    font-size: 42px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-dark) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.about-tagline {
+    font-size: 18px;
+    color: var(--text-secondary);
+}
+
+.about-section {
+    max-width: 800px;
+    margin: 0 auto 48px;
+    padding: 0 20px;
+}
+
+.about-section h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--text-primary);
+}
+
+.about-text {
+    font-size: 16px;
+    color: var(--text-secondary);
+    line-height: 1.8;
+}
+
+/* Founders Grid */
+.founders-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+@media (max-width: 700px) {
+    .founders-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.founder-card {
+    background: var(--bg-primary);
+    border-radius: var(--radius-xl);
+    padding: 32px;
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow);
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.founder-avatar {
+    width: 64px;
+    height: 64px;
+    min-width: 64px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.founder-info h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--text-primary);
+}
+
+.founder-role {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--primary);
+    display: block;
+    margin-bottom: 16px;
+}
+
+.founder-bio {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.founder-bio li {
+    font-size: 14px;
+    color: var(--text-secondary);
+    padding: 4px 0;
+    padding-left: 16px;
+    position: relative;
+}
+
+.founder-bio li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 12px;
+    width: 6px;
+    height: 6px;
+    background: var(--primary-light);
+    border-radius: 50%;
+}
+
+.founders-note {
+    text-align: center;
+    font-size: 15px;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* About CTA */
+.about-cta {
+    text-align: center;
+    padding: 48px 24px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    border-radius: var(--radius-xl);
+    margin: 48px auto;
+    max-width: 600px;
+}
+
+.about-cta h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--text-primary);
+}
+
+.about-cta .btn-primary {
+    width: auto;
+    display: inline-flex;
+    padding: 14px 32px;
+    text-decoration: none;
+    margin-top: 0;
+}
+
+/* Active nav link */
+.nav-link.active {
+    color: var(--primary);
+}
+
 /* Animations */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
