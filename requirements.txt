@@ -2,23 +2,23 @@
 # Render Professional Plan
 
 # Web framework
-fastapi==0.104.1
-uvicorn==0.24.0
-python-multipart==0.0.6
+fastapi>=0.109.0
+uvicorn>=0.27.0
+python-multipart>=0.0.9
 
 # Authentication
-python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
 
 # Database
-aiosqlite==0.19.0
+aiosqlite>=0.19.0
 
-# Data validation
-pydantic==2.5.2
-pydantic-settings==2.1.0
+# Data validation (use versions with pre-built wheels for Python 3.13)
+pydantic>=2.10.0
+pydantic-settings>=2.6.0
 
 # File handling
-aiofiles==23.2.1
+aiofiles>=23.2.1
 
 # For report generation
 anthropic>=0.18.0
