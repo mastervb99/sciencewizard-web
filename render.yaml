@@ -1,15 +1,32 @@
-# Velvet Research - Phase I Static Frontend
-# Render deployment configuration
+# Velvet Research - Full Implementation
+# Render Professional deployment configuration
 
 services:
   - type: web
-    name: sciencewizard
+    name: velvet-research
     runtime: python
-    plan: free
+    plan: professional
     buildCommand: pip install -r requirements.txt
-    startCommand: python server.py
+    startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION
         value: "3.11"
       - key: PORT
         value: "8000"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: DATABASE_URL
+        value: "sqlite+aiosqlite:///./velvet.db"
+      - key: UPLOAD_DIR
+        value: "/tmp/velvet_uploads"
+      - key: REPORT_DIR
+        value: "/tmp/velvet_reports"
+      - key: SCIENCE_WIZARD_PATH
+        value: "/opt/render/project/src/science_wizard_project"
+    disk:
+      name: velvet-data
+      mountPath: /data
+      sizeGB: 1

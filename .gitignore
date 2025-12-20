@@ -23,3 +23,8 @@ Thumbs.db
 *.log
 uploads/
 reports/
+*.db
+velvet.db
+
+# Test files
+test_*.py

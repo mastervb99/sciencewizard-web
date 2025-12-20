@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Report - Velvet Research</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .review-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .status-card {
+            background: var(--bg-primary);
+            border-radius: var(--radius-xl);
+            padding: 40px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 32px;
+        }
+        .status-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .status-icon.processing {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+        }
+        .status-icon.completed {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+        .status-icon.failed {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+        }
+        .status-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .status-message {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        .progress-text {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        .action-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 24px;
+        }
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 24px;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--error);
+            padding: 16px;
+            border-radius: var(--radius);
+            margin-top: 16px;
+            text-align: left;
+        }
+        .hidden {
+            display: none !important;
+        }
+        /* Spinner animation */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <a href="/" class="logo">
+                <span class="logo-icon">VR</span>
+                <span class="logo-text">Velvet Research</span>
+            </a>
+            <nav class="nav">
+                <a href="/" class="nav-link">Home</a>
+                <a href="about.html" class="nav-link">About</a>
+                <button class="nav-link login-link" id="logoutBtn">Log Out</button>
+            </nav>
+        </header>
+
+        <!-- Review Content -->
+        <main class="main review-container">
+            <!-- Processing State -->
+            <div class="status-card" id="processingCard">
+                <div class="status-icon processing">
+                    <svg class="spinner" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" stroke-opacity="0.25"/>
+                        <path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <h2 class="status-title">Generating Your Manuscript</h2>
+                <p class="status-message" id="statusMessage">Analyzing your research data...</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+                <p class="progress-text"><span id="progressText">0</span>% complete</p>
+            </div>
+
+            <!-- Completed State -->
+            <div class="status-card hidden" id="completedCard">
+                <div class="status-icon completed">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                </div>
+                <h2 class="status-title">Your Manuscript is Ready!</h2>
+                <p class="status-message">Your AI-generated research manuscript has been created.</p>
+                <div class="action-buttons">
+                    <button class="btn-primary" id="downloadBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Download Word Document
+                    </button>
+                    <a href="/" class="btn-secondary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"/>
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                        Generate New Report
+                    </a>
+                </div>
+            </div>
+
+            <!-- Failed State -->
+            <div class="status-card hidden" id="failedCard">
+                <div class="status-icon failed">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="15" y1="9" x2="9" y2="15"/>
+                        <line x1="9" y1="9" x2="15" y2="15"/>
+                    </svg>
+                </div>
+                <h2 class="status-title">Generation Failed</h2>
+                <p class="status-message">We encountered an error while generating your manuscript.</p>
+                <div class="error-message" id="errorMessage"></div>
+                <div class="action-buttons">
+                    <a href="/" class="btn-primary">Try Again</a>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="logo-icon small">VR</span>
+                    <span>Velvet Research</span>
+                </div>
+                <div class="footer-links">
+                    <a href="about.html">About</a>
+                    <a href="#">Privacy</a>
+                    <a href="#">Terms</a>
+                    <a href="#">Contact</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Get job ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const jobId = urlParams.get('job');
+        const token = localStorage.getItem('velvet_token');
+
+        // Check auth
+        if (!token) {
+            window.location.href = '/';
+        }
+
+        // Elements
+        const processingCard = document.getElementById('processingCard');
+        const completedCard = document.getElementById('completedCard');
+        const failedCard = document.getElementById('failedCard');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const statusMessage = document.getElementById('statusMessage');
+        const errorMessage = document.getElementById('errorMessage');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        // Status messages
+        const statusMessages = [
+            'Loading data files...',
+            'Analyzing data structure...',
+            'Initializing AI agents...',
+            'Planning statistical analysis...',
+            'Generating analysis code...',
+            'Executing analysis...',
+            'Writing manuscript...',
+            'Formatting document...',
+            'Finalizing...'
+        ];
+
+        // Poll job status
+        let pollInterval;
+
+        async function pollStatus() {
+            if (!jobId) {
+                showFailed('No job ID provided');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/status/${jobId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        localStorage.removeItem('velvet_token');
+                        window.location.href = '/';
+                        return;
+                    }
+                    throw new Error('Failed to get status');
+                }
+
+                const data = await response.json();
+                updateProgress(data.progress);
+
+                if (data.status === 'completed') {
+                    clearInterval(pollInterval);
+                    showCompleted();
+                } else if (data.status === 'failed') {
+                    clearInterval(pollInterval);
+                    showFailed(data.error || 'Unknown error occurred');
+                }
+            } catch (error) {
+                console.error('Poll error:', error);
+            }
+        }
+
+        function updateProgress(progress) {
+            const percent = Math.round(progress * 100);
+            progressFill.style.width = `${percent}%`;
+            progressText.textContent = percent;
+
+            // Update message based on progress
+            const messageIndex = Math.min(
+                Math.floor(progress * statusMessages.length),
+                statusMessages.length - 1
+            );
+            statusMessage.textContent = statusMessages[messageIndex];
+        }
+
+        function showCompleted() {
+            processingCard.classList.add('hidden');
+            failedCard.classList.add('hidden');
+            completedCard.classList.remove('hidden');
+        }
+
+        function showFailed(error) {
+            processingCard.classList.add('hidden');
+            completedCard.classList.add('hidden');
+            failedCard.classList.remove('hidden');
+            errorMessage.textContent = error;
+        }
+
+        // Download handler
+        downloadBtn.addEventListener('click', async () => {
+            try {
+                const response = await fetch(`/api/download/${jobId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Download failed');
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'velvet_research_manuscript.docx';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                a.remove();
+            } catch (error) {
+                alert('Download failed. Please try again.');
+            }
+        });
+
+        // Logout handler
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('velvet_token');
+            localStorage.removeItem('velvet_user');
+            window.location.href = '/';
+        });
+
+        // Start polling
+        pollStatus();
+        pollInterval = setInterval(pollStatus, 2000);
+    </script>
+</body>
+</html>

@@ -1,125 +1,127 @@
-# Velvet Research Web Frontend
+# Velvet Research Web Application
 
-**Status:** Phase I Complete - Awaiting stakeholder feedback from Omri and Bar
-
-**Live URL:** https://sciencewizard.onrender.com (free tier - 15-30s cold start after inactivity)
-
+**Status:** Full Implementation Complete - Ready for Deployment
+**Plan:** Render Professional
+**Live URL:** https://velvet-research.onrender.com (after deployment)
 **GitHub:** https://github.com/mastervb99/sciencewizard-web
 
-## Current State (December 2025)
+## Features Implemented
 
-Phase I static mockup deployed. Shows visual design only - no backend functionality.
-
-### What's Live
-- Landing page with upload UI mockup
-- Login/signup form appearance (non-functional)
-- Feature cards (Manuscripts, Stats, Figures, Export)
-- About page with founder bios (Omri CEO, Vafa CTO)
-
-### What's NOT Implemented Yet
-- Actual file uploads
-- Authentication
-- Report generation
-- Downloads
-- Section-by-section review flow
-
-## How to Modify
-
-### Quick Edits (HTML/CSS only)
-```bash
-cd /Users/vafabayat/Dropbox/Financial/0ScienceWizard/sciencewizard_web
-
-# Edit files
-# - static/index.html     → Landing page
-# - static/about.html     → About/founders page
-# - static/css/style.css  → All styling
-# - static/js/app.js      → Basic interactions
-
-# Test locally
-source venv/bin/activate
-python server.py
-# Visit http://localhost:8000
-
-# Deploy
-git add -A && git commit -m "Description of changes" && git push
-# Render auto-deploys from GitHub (1-2 min)
-```
-
-### Adding New Pages
-1. Create `static/newpage.html`
-2. Add route in `server.py`:
-   ```python
-   @app.get("/newpage.html")
-   async def newpage():
-       return FileResponse(STATIC_DIR / "newpage.html")
-   ```
-3. Commit and push
+| Feature | Status |
+|---------|--------|
+| User Registration | Done |
+| User Login (JWT) | Done |
+| File Upload | Done |
+| Report Generation | Done |
+| Progress Tracking | Done |
+| Word Download | Done |
+| Section Feedback | Done |
+| Regeneration | Done |
 
 ## Project Structure
 
 ```
-sciencewizard_web/
-├── server.py              # FastAPI server
-├── render.yaml            # Render deployment config
-├── requirements.txt       # fastapi, uvicorn
+velvet_web/
+├── server.py              # FastAPI application (all endpoints)
+├── config.py              # Environment configuration
+├── database.py            # SQLite database models
+├── render.yaml            # Render Professional config
+├── requirements.txt       # Python dependencies
 ├── .gitignore
-├── README.md              # This file
-├── venv/                  # Local virtual environment (not in git)
+├── README.md
+├── services/
+│   ├── __init__.py
+│   ├── auth.py            # JWT authentication
+│   ├── upload.py          # File upload handling
+│   └── report_generator.py # Manuscript generation
 └── static/
     ├── index.html         # Landing page
     ├── about.html         # Founders page
+    ├── review.html        # Report review/download page
     ├── css/
-    │   └── style.css      # All styles (~700 lines)
+    │   └── style.css      # All styles
     └── js/
-        └── app.js         # Tab switching, drag/drop visuals
+        └── app.js         # Frontend application
 ```
 
-## Deployment Details
+## API Endpoints
 
-### Render Configuration
-- **Service:** Web Service (Python)
-- **Plan:** Free ($0/month)
-- **Build:** `pip install -r requirements.txt`
-- **Start:** `python server.py`
-- **Auto-deploy:** Yes, from GitHub main branch
+### Authentication
+- `POST /api/auth/register` - Create account
+- `POST /api/auth/login` - Login, get JWT token
+- `GET /api/auth/me` - Get current user
 
-### Free Tier Limitations
-- Spins down after 15 min inactivity
-- Cold start: 15-30 seconds
-- 512MB RAM, 0.1 CPU
-- For demos: warn users about initial load time
-- Upgrade to Starter ($7/mo) for always-on
+### File Upload
+- `POST /api/upload` - Upload files (multipart)
+- `GET /api/upload/{upload_id}` - Get upload info
 
-## Next Steps (Pending Feedback)
+### Report Generation
+- `POST /api/generate` - Start generation job
+- `GET /api/status/{job_id}` - Get job status
+- `GET /api/jobs` - List user's jobs
+- `GET /api/download/{job_id}` - Download report
 
-### Phase II: Authentication
-- Add `/api/auth/register` and `/api/auth/login` endpoints
-- JWT token handling
-- User session persistence
+### Feedback (Phase 2)
+- `POST /api/feedback/{job_id}` - Submit section feedback
+- `POST /api/regenerate/{job_id}` - Regenerate with feedback
 
-### Phase III: File Upload
-- Actual file upload to server
-- File validation (type, size)
-- Temporary storage
+## Local Development
 
-### Phase IV: Report Generation
-- Connect to Velvet Research agents
-- Background job processing
-- Progress polling
+```bash
+cd /Users/vafabayat/Dropbox/Financial/0ScienceWizard/velvet_web
 
-### Phase V: Review Flow
-- Section-by-section approval (per Omri's design)
-- Feedback collection
-- Regeneration with feedback
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Set environment variables
+export ANTHROPIC_API_KEY="your-key"
+export JWT_SECRET="dev-secret"
+
+# Run server
+python server.py
+# Visit http://localhost:8000
+```
+
+## Deployment
+
+### Render Professional ($25/month)
+- 2GB RAM, dedicated CPU
+- Always-on (no cold starts)
+- 1GB persistent disk for data
+- Auto-deploy from GitHub
+
+### Environment Variables (Set in Render Dashboard)
+- `ANTHROPIC_API_KEY` - Anthropic API key (required)
+- `JWT_SECRET` - Auto-generated by Render
+- `PYTHON_VERSION` - 3.11
+
+### Deploy Steps
+1. Push changes to GitHub
+2. Create new Web Service in Render
+3. Connect GitHub repository
+4. Select `render.yaml` configuration
+5. Set `ANTHROPIC_API_KEY` in environment
+6. Deploy
+
+## User Flow
+
+1. **Upload** - User uploads research files (CSV, DOCX, PDF, etc.)
+2. **Auth** - User signs up or logs in
+3. **Generate** - System generates manuscript using AI
+4. **Review** - User sees progress, downloads Word document
+5. **Iterate** - User can provide feedback and regenerate (Phase 2)
 
 ## Key Contacts
 
-- **Omri Weisman** (CEO) - Product/design decisions
-- **Bar** - Stakeholder feedback
-- **Vafa Bayat** (CTO) - Technical implementation
+- **Omri Weisman, PhD** (CEO) - omri@planetmed.pro
+- **Vafa Bayat, MD, PhD** (CTO) - vafa@bitscopic.com
 
-## Related Documents
+## Version History
 
-- `/Users/vafabayat/Dropbox/Financial/0ScienceWizard/VelvetResearch_Web_Deployment_Plan.md` - Full architecture plan
-- `/Users/vafabayat/Dropbox/Financial/0ScienceWizard/Startup design Omri.docx` - Original UI spec from Omri
-- `/Users/vafabayat/Dropbox/Financial/0ScienceWizard/Presentations/` - Preseed deck and materials
+- **Dec 20, 2025** - Full implementation (auth, upload, generation, download)
+- **Dec 17, 2025** - Phase I static mockup deployed
+- **Dec 20, 2025** - Rebranded to Velvet Research
