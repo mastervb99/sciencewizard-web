@@ -1,4 +1,4 @@
-# ScienceWizard Web Frontend
+# Velvet Research Web Frontend
 
 **Status:** Phase I Complete - Awaiting stakeholder feedback from Omri and Bar
 
@@ -103,7 +103,7 @@ sciencewizard_web/
 - Temporary storage
 
 ### Phase IV: Report Generation
-- Connect to ScienceWizard agents
+- Connect to Velvet Research agents
 - Background job processing
 - Progress polling
 
@@ -120,6 +120,6 @@ sciencewizard_web/
 
 ## Related Documents
 
-- `/Users/vafabayat/Dropbox/Financial/0ScienceWizard/ScienceWizard_Web_Deployment_Plan.md` - Full architecture plan
+- `/Users/vafabayat/Dropbox/Financial/0ScienceWizard/VelvetResearch_Web_Deployment_Plan.md` - Full architecture plan
 - `/Users/vafabayat/Dropbox/Financial/0ScienceWizard/Startup design Omri.docx` - Original UI spec from Omri
 - `/Users/vafabayat/Dropbox/Financial/0ScienceWizard/Presentations/` - Preseed deck and materials

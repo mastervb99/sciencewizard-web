@@ -1,5 +1,5 @@
 """
-ScienceWizard - Phase I Static Frontend Server
+Velvet Research - Phase I Static Frontend Server
 
 Minimal server that serves static files.
 Will be extended with API endpoints in Phase II.
@@ -13,7 +13,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
 app = FastAPI(
-    title="ScienceWizard",
+    title="Velvet Research",
     description="From Data to Publication in Hours",
     version="0.1.0"
 )

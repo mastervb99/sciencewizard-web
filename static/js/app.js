@@ -1,5 +1,5 @@
 /**
- * ScienceWizard - Phase I Static Frontend
+ * Velvet Research - Phase I Static Frontend
  * Basic interactions only - no actual functionality
  */
 
