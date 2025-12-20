@@ -16,6 +16,7 @@ aiosqlite>=0.19.0
 # Data validation (use versions with pre-built wheels for Python 3.13)
 pydantic>=2.10.0
 pydantic-settings>=2.6.0
+email-validator>=2.0.0
 
 # File handling
 aiofiles>=23.2.1
