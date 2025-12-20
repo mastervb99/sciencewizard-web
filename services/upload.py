@@ -10,8 +10,6 @@ from datetime import datetime
 from typing import List
 from fastapi import UploadFile, HTTPException
 
-import sys
-sys.path.insert(0, "..")
 from config import settings
 
 

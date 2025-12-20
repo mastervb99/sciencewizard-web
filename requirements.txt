@@ -1,5 +1,5 @@
 # Velvet Research - Full Dependencies
-# Render Starter Plan
+# Render Professional Plan
 
 # Web framework
 fastapi==0.104.1
@@ -18,13 +18,9 @@ pydantic==2.5.2
 pydantic-settings==2.1.0
 
 # File handling
-python-magic==0.4.27
 aiofiles==23.2.1
 
-# Email (Phase 2)
-# sendgrid==6.11.0
-
-# For report generation (imports from science_wizard_project)
+# For report generation
 anthropic>=0.18.0
 python-docx>=0.8.11
 pandas>=2.0.0

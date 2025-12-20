@@ -24,8 +24,6 @@ services:
         value: "/tmp/velvet_uploads"
       - key: REPORT_DIR
         value: "/tmp/velvet_reports"
-      - key: SCIENCE_WIZARD_PATH
-        value: "/opt/render/project/src/science_wizard_project"
     disk:
       name: velvet-data
       mountPath: /data

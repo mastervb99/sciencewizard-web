@@ -11,8 +11,6 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel, EmailStr
 
-import sys
-sys.path.insert(0, "..")
 from config import settings
 
 # Password hashing
