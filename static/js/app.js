@@ -47,8 +47,11 @@ document.addEventListener('DOMContentLoaded', function() {
     checkAuth();
     setupUploadZone();
     setupAuthForms();
+    setupAuthModal();
     setupContinueButton();
     setupNavigation();
+    setupSampleButtons();
+    setupReferralButton();
 });
 
 // Check authentication status
@@ -144,6 +147,9 @@ function handleFiles(files) {
         // Add to list
         uploadedFiles.push(file);
 
+        // Show files list
+        filesList.style.display = 'block';
+
         // Update UI
         const fileItem = document.createElement('div');
         fileItem.className = 'file-item';
@@ -157,16 +163,6 @@ function handleFiles(files) {
             <span class="file-size">${formatFileSize(file.size)}</span>
         `;
         filesList.appendChild(fileItem);
-    }
-
-    // Clear the demo files if any
-    const demoFiles = filesList.querySelectorAll('.file-item');
-    if (uploadedFiles.length > 0 && demoFiles.length > uploadedFiles.length) {
-        // Remove first N demo items
-        const toRemove = demoFiles.length - uploadedFiles.length;
-        for (let i = 0; i < toRemove; i++) {
-            demoFiles[i].remove();
-        }
     }
 }
 
@@ -222,9 +218,13 @@ function setupAuthForms() {
                 localStorage.setItem('velvet_token', data.access_token);
                 localStorage.setItem('velvet_user', JSON.stringify(data.user));
                 isAuthenticated = true;
+                hideAuthModal();
+                updateAuthUI();
 
-                // Proceed with upload
-                await processUploadAndGenerate();
+                // Proceed with upload if files are ready
+                if (uploadedFiles.length > 0) {
+                    await processUploadAndGenerate();
+                }
 
             } catch (error) {
                 alert(error.message);
@@ -266,9 +266,13 @@ function setupAuthForms() {
                 localStorage.setItem('velvet_token', data.access_token);
                 localStorage.setItem('velvet_user', JSON.stringify(data.user));
                 isAuthenticated = true;
+                hideAuthModal();
+                updateAuthUI();
 
-                // Proceed with upload
-                await processUploadAndGenerate();
+                // Proceed with upload if files are ready
+                if (uploadedFiles.length > 0) {
+                    await processUploadAndGenerate();
+                }
 
             } catch (error) {
                 alert(error.message);
@@ -292,11 +296,8 @@ function setupContinueButton() {
                 // Already logged in, proceed directly
                 await processUploadAndGenerate();
             } else {
-                // Show auth section
-                const authSection = document.getElementById('authSection');
-                if (authSection) {
-                    authSection.scrollIntoView({ behavior: 'smooth' });
-                }
+                // Show auth modal
+                showAuthModal();
             }
         });
     }
@@ -372,7 +373,7 @@ async function processUploadAndGenerate() {
         if (continueBtn) {
             continueBtn.disabled = false;
             continueBtn.innerHTML = `
-                Continue
+                <span>Generate Research Project</span>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="5" y1="12" x2="19" y2="12"/>
                     <polyline points="12 5 19 12 12 19"/>
@@ -386,13 +387,163 @@ async function processUploadAndGenerate() {
 function setupNavigation() {
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            if (href === '#') return; // Skip empty hash
             e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
+            const target = document.querySelector(href);
             if (target) {
                 target.scrollIntoView({ behavior: 'smooth' });
             }
         });
     });
+}
+
+// Auth Modal
+function setupAuthModal() {
+    const authSection = document.getElementById('authSection');
+    const authClose = document.getElementById('authClose');
+    const loginLink = document.querySelector('.login-link');
+
+    // Open modal on login link click
+    if (loginLink && !isAuthenticated) {
+        loginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showAuthModal();
+        });
+    }
+
+    // Close modal on close button
+    if (authClose) {
+        authClose.addEventListener('click', () => {
+            hideAuthModal();
+        });
+    }
+
+    // Close modal on backdrop click
+    if (authSection) {
+        authSection.addEventListener('click', (e) => {
+            if (e.target === authSection) {
+                hideAuthModal();
+            }
+        });
+    }
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            hideAuthModal();
+        }
+    });
+}
+
+function showAuthModal() {
+    const authSection = document.getElementById('authSection');
+    if (authSection) {
+        authSection.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function hideAuthModal() {
+    const authSection = document.getElementById('authSection');
+    if (authSection) {
+        authSection.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+}
+
+// Sample Buttons
+function setupSampleButtons() {
+    const sampleBtns = document.querySelectorAll('.sample-btn');
+
+    sampleBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const sampleType = btn.getAttribute('data-sample');
+            loadSampleData(sampleType);
+        });
+    });
+}
+
+function loadSampleData(type) {
+    const filesList = document.getElementById('filesList');
+
+    // Clear existing files
+    uploadedFiles = [];
+    if (filesList) {
+        filesList.innerHTML = '';
+        filesList.style.display = 'block';
+    }
+
+    // Create mock sample files based on type
+    const samples = {
+        clinical: [
+            { name: 'clinical_trial_data.csv', size: '2.4 MB' },
+            { name: 'study_protocol.docx', size: '156 KB' }
+        ],
+        survey: [
+            { name: 'survey_responses.xlsx', size: '1.8 MB' },
+            { name: 'survey_questions.docx', size: '45 KB' }
+        ]
+    };
+
+    const files = samples[type] || samples.clinical;
+
+    files.forEach(file => {
+        const fileItem = document.createElement('div');
+        fileItem.className = 'file-item';
+        fileItem.innerHTML = `
+            <span class="file-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+            </span>
+            <span class="file-name">${file.name}</span>
+            <span class="file-size">${file.size}</span>
+        `;
+        filesList.appendChild(fileItem);
+
+        // Create a mock File object for demo
+        const mockFile = new File([''], file.name, { type: 'text/plain' });
+        uploadedFiles.push(mockFile);
+    });
+
+    // Scroll to upload area
+    const uploadCard = document.querySelector('.upload-card');
+    if (uploadCard) {
+        uploadCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+}
+
+// Referral Button
+function setupReferralButton() {
+    const referralBtn = document.querySelector('.btn-referral');
+
+    if (referralBtn) {
+        referralBtn.addEventListener('click', () => {
+            if (isAuthenticated) {
+                // Generate and show referral link
+                const user = JSON.parse(localStorage.getItem('velvet_user') || '{}');
+                const refCode = btoa(user.email || 'demo').slice(0, 8);
+                const refLink = `${window.location.origin}?ref=${refCode}`;
+
+                // Copy to clipboard
+                navigator.clipboard.writeText(refLink).then(() => {
+                    referralBtn.textContent = 'Link Copied!';
+                    setTimeout(() => {
+                        referralBtn.textContent = 'Get Your Referral Link';
+                    }, 2000);
+                }).catch(() => {
+                    prompt('Copy your referral link:', refLink);
+                });
+            } else {
+                // Show auth modal for signup
+                showAuthModal();
+                // Switch to signup tab
+                const signupTab = document.querySelector('.auth-tab[data-tab="signup"]');
+                if (signupTab) signupTab.click();
+            }
+        });
+    }
 }
 
 // Add spinner CSS
