@@ -65,6 +65,44 @@ async def init_db():
             )
         """)
 
+        # Token management tables
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS user_tokens (
+                user_id TEXT PRIMARY KEY,
+                balance INTEGER DEFAULT 0,
+                total_purchased INTEGER DEFAULT 0,
+                last_updated TEXT NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            )
+        """)
+
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS token_transactions (
+                id TEXT PRIMARY KEY,
+                user_id TEXT NOT NULL,
+                type TEXT NOT NULL,
+                amount INTEGER NOT NULL,
+                description TEXT,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            )
+        """)
+
+        # Referral system tables
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS referrals (
+                id TEXT PRIMARY KEY,
+                referrer_user_id TEXT NOT NULL,
+                referral_code TEXT UNIQUE NOT NULL,
+                referee_email TEXT,
+                referee_user_id TEXT,
+                tokens_awarded INTEGER DEFAULT 0,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY (referrer_user_id) REFERENCES users(id),
+                FOREIGN KEY (referee_user_id) REFERENCES users(id)
+            )
+        """)
+
         await db.commit()
 
 
@@ -154,3 +192,133 @@ async def get_user_jobs(db, user_id: str):
         (user_id,)
     )
     return await cursor.fetchall()
+
+
+# Token operations
+async def get_user_tokens(db, user_id: str):
+    cursor = await db.execute("SELECT * FROM user_tokens WHERE user_id = ?", (user_id,))
+    row = await cursor.fetchone()
+    if row:
+        return dict(row)
+    else:
+        # Create initial token balance
+        await db.execute(
+            "INSERT INTO user_tokens (user_id, balance, total_purchased, last_updated) VALUES (?, 0, 0, ?)",
+            (user_id, datetime.utcnow().isoformat())
+        )
+        await db.commit()
+        return {"user_id": user_id, "balance": 0, "total_purchased": 0}
+
+
+async def add_tokens(db, user_id: str, amount: int, transaction_type: str, description: str):
+    # Add token transaction
+    import uuid
+    transaction_id = str(uuid.uuid4())
+    await db.execute(
+        "INSERT INTO token_transactions (id, user_id, type, amount, description, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+        (transaction_id, user_id, transaction_type, amount, description, datetime.utcnow().isoformat())
+    )
+
+    # Update user balance
+    await db.execute(
+        "UPDATE user_tokens SET balance = balance + ?, last_updated = ? WHERE user_id = ?",
+        (amount, datetime.utcnow().isoformat(), user_id)
+    )
+
+    # Update total purchased if it's a purchase
+    if transaction_type == "purchase":
+        await db.execute(
+            "UPDATE user_tokens SET total_purchased = total_purchased + ? WHERE user_id = ?",
+            (amount, user_id)
+        )
+
+    await db.commit()
+
+
+async def consume_tokens(db, user_id: str, amount: int, description: str):
+    # Check if user has enough tokens
+    user_tokens = await get_user_tokens(db, user_id)
+    if user_tokens["balance"] < amount:
+        return False
+
+    # Deduct tokens
+    await add_tokens(db, user_id, -amount, "consumption", description)
+    return True
+
+
+async def get_token_transactions(db, user_id: str, limit: int = 20):
+    cursor = await db.execute(
+        "SELECT * FROM token_transactions WHERE user_id = ? ORDER BY created_at DESC LIMIT ?",
+        (user_id, limit)
+    )
+    return await cursor.fetchall()
+
+
+# Referral operations
+async def create_referral(db, referrer_user_id: str, referral_code: str):
+    import uuid
+    referral_id = str(uuid.uuid4())
+    await db.execute(
+        "INSERT INTO referrals (id, referrer_user_id, referral_code, created_at) VALUES (?, ?, ?, ?)",
+        (referral_id, referrer_user_id, referral_code, datetime.utcnow().isoformat())
+    )
+    await db.commit()
+    return referral_id
+
+
+async def get_referral_by_code(db, referral_code: str):
+    cursor = await db.execute("SELECT * FROM referrals WHERE referral_code = ?", (referral_code,))
+    return await cursor.fetchone()
+
+
+async def get_user_referral_code(db, user_id: str):
+    cursor = await db.execute("SELECT referral_code FROM referrals WHERE referrer_user_id = ? LIMIT 1", (user_id,))
+    return await cursor.fetchone()
+
+
+async def record_referral_signup(db, referral_code: str, referee_user_id: str):
+    await db.execute(
+        "UPDATE referrals SET referee_user_id = ? WHERE referral_code = ?",
+        (referee_user_id, referral_code)
+    )
+    await db.commit()
+
+
+async def award_referral_tokens(db, referral_code: str):
+    # Get referral info
+    referral = await get_referral_by_code(db, referral_code)
+    if not referral or referral["referee_user_id"] is None or referral["tokens_awarded"] > 0:
+        return False
+
+    # Award 25 tokens to referrer
+    await add_tokens(db, referral["referrer_user_id"], 25, "referral_bonus",
+                     f"Referral bonus for {referral['referee_user_id']}")
+
+    # Mark as awarded
+    await db.execute(
+        "UPDATE referrals SET tokens_awarded = 25 WHERE referral_code = ?",
+        (referral_code,)
+    )
+    await db.commit()
+    return True
+
+
+async def send_referral_invitation(db, referrer_user_id: str, referee_email: str):
+    # Get or create referral code for user
+    referral = await get_user_referral_code(db, referrer_user_id)
+    if not referral:
+        # Generate new referral code
+        import random, string
+        referral_code = f"VR-{referrer_user_id[:3].upper()}{random.randint(100, 999)}"
+        await create_referral(db, referrer_user_id, referral_code)
+    else:
+        referral_code = referral["referral_code"]
+
+    # Record the email invitation
+    await db.execute(
+        "UPDATE referrals SET referee_email = ? WHERE referral_code = ?",
+        (referee_email, referral_code)
+    )
+    await db.commit()
+
+    return referral_code

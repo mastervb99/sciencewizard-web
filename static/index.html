@@ -153,40 +153,52 @@
 
             <!-- Pricing Section -->
             <div class="pricing-section" id="pricing">
-                <h2 class="section-title">Simple, Transparent Pricing</h2>
-                <p class="section-subtitle">Pay only for what you use. No subscriptions required.</p>
+                <h2 class="section-title">Token-Based Pricing</h2>
+                <p class="section-subtitle">Pay only for what you use. Tokens never expire.</p>
                 <div class="pricing-grid">
                     <div class="pricing-card">
-                        <h3>Free Trial</h3>
-                        <div class="price">$0</div>
-                        <p class="price-desc">Try with sample data</p>
+                        <h3>Starter Pack</h3>
+                        <div class="price">$139</div>
+                        <p class="price-desc">150 tokens (7% savings)</p>
                         <ul class="pricing-features">
-                            <li>1 sample project</li>
-                            <li>Basic statistical analysis</li>
-                            <li>Word export</li>
+                            <li>1-2 basic projects</li>
+                            <li>Statistical analysis & figures</li>
+                            <li>Word & PDF export</li>
+                            <li>Downloadable Python code</li>
                         </ul>
                     </div>
                     <div class="pricing-card featured">
                         <div class="featured-badge">Most Popular</div>
-                        <h3>Pay Per Project</h3>
-                        <div class="price">$15-50</div>
-                        <p class="price-desc">Based on complexity</p>
+                        <h3>Professional Pack</h3>
+                        <div class="price">$449</div>
+                        <p class="price-desc">500 tokens (10% savings)</p>
                         <ul class="pricing-features">
-                            <li>Full manuscript generation</li>
-                            <li>Complete statistical analysis</li>
-                            <li>Publication-ready figures</li>
-                            <li>Word & PDF export</li>
-                        </ul>
-                    </div>
-                    <div class="pricing-card">
-                        <h3>Bulk Credits</h3>
-                        <div class="price">Save 20%</div>
-                        <p class="price-desc">Pre-purchase credits</p>
-                        <ul class="pricing-features">
-                            <li>Discounted rates</li>
+                            <li>2-5 comprehensive projects</li>
+                            <li>Advanced statistical analysis</li>
+                            <li>Publication-ready manuscripts</li>
                             <li>Priority processing</li>
                             <li>Team sharing</li>
                         </ul>
+                    </div>
+                    <div class="pricing-card">
+                        <h3>Enterprise Pack</h3>
+                        <div class="price">$849</div>
+                        <p class="price-desc">1,000 tokens (15% savings)</p>
+                        <ul class="pricing-features">
+                            <li>5-10 complex projects</li>
+                            <li>Maximum volume discount</li>
+                            <li>Dedicated support</li>
+                            <li>Consultation credits</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="pricing-info">
+                    <h3>Project Token Requirements</h3>
+                    <div class="token-breakdown">
+                        <span class="token-item"><strong>Basic Analysis:</strong> 100 tokens ($99 value)</span>
+                        <span class="token-item"><strong>Standard Project:</strong> 200 tokens ($199 value)</span>
+                        <span class="token-item"><strong>Premium Manuscript:</strong> 300 tokens ($299 value)</span>
+                        <span class="token-item"><strong>Complex Research:</strong> 500 tokens ($499 value)</span>
                     </div>
                 </div>
             </div>
@@ -195,10 +207,39 @@
             <div class="referral-section">
                 <div class="referral-card">
                     <div class="referral-content">
-                        <h3>Share & Earn Free Credits</h3>
-                        <p>Invite colleagues and get free project credits when they sign up.</p>
+                        <h3>Share & Earn 25 Free Tokens</h3>
+                        <p>Invite colleagues and get 25 tokens when they purchase their first pack. They get 15% off too!</p>
                     </div>
-                    <button class="btn-referral">Get Your Referral Link</button>
+                    <div class="referral-methods">
+                        <button class="btn-referral" id="generateReferralBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                            </svg>
+                            Get My Referral Code
+                        </button>
+                        <div class="referral-code-display" id="referralCodeDisplay" style="display: none;">
+                            <div class="code-container">
+                                <span class="referral-code" id="referralCode"></span>
+                                <button class="btn-copy" id="copyCodeBtn">Copy</button>
+                            </div>
+                            <p class="code-instructions">Share this code with colleagues for instant signup bonus!</p>
+                        </div>
+                        <div class="email-invite-section">
+                            <h4>Or Send Direct Invitations</h4>
+                            <div class="invite-form">
+                                <input type="email" placeholder="colleague@university.edu" id="inviteEmail" class="invite-email-input">
+                                <button class="btn-email-invite" id="emailInviteBtn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                        <polyline points="22,6 12,13 2,6"/>
+                                    </svg>
+                                    Send Invitation
+                                </button>
+                            </div>
+                            <div class="invite-status" id="inviteStatus" style="display: none;"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

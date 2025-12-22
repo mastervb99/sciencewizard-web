@@ -1092,3 +1092,231 @@ body {
     border-color: var(--primary-light);
     background: rgba(99, 102, 241, 0.04);
 }
+
+/* Token Breakdown Styles */
+.pricing-info {
+    margin-top: 40px;
+    padding: 24px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius);
+    text-align: center;
+}
+
+.pricing-info h3 {
+    margin-bottom: 16px;
+    color: var(--text-primary);
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.token-breakdown {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.token-item {
+    background: var(--bg-primary);
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+/* Enhanced Referral Styles */
+.referral-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.referral-code-display {
+    background: var(--bg-secondary);
+    padding: 20px;
+    border-radius: var(--radius);
+    border: 2px dashed var(--primary-light);
+}
+
+.code-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.referral-code {
+    font-family: 'Monaco', 'Consolas', monospace;
+    font-size: 18px;
+    font-weight: 600;
+    background: var(--bg-primary);
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    color: var(--primary);
+    letter-spacing: 1px;
+}
+
+.btn-copy {
+    padding: 8px 16px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-copy:hover {
+    background: var(--primary-dark);
+}
+
+.code-instructions {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin: 0;
+}
+
+.email-invite-section h4 {
+    margin-bottom: 12px;
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.invite-form {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.invite-email-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.invite-email-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.btn-email-invite {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    white-space: nowrap;
+}
+
+.btn-email-invite:hover {
+    background: var(--primary-dark);
+}
+
+.invite-status {
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.invite-status.success {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.invite-status.error {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--error);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* Download Section Styles */
+.download-section {
+    margin-top: 32px;
+    padding: 24px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+}
+
+.download-section h3 {
+    margin-bottom: 16px;
+    color: var(--text-primary);
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.btn-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 8px 8px 0;
+    padding: 12px 20px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-download:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+}
+
+/* Responsive Design for New Elements */
+@media (max-width: 768px) {
+    .token-breakdown {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .token-item {
+        white-space: normal;
+        text-align: center;
+    }
+
+    .invite-form {
+        flex-direction: column;
+    }
+
+    .invite-email-input {
+        width: 100%;
+    }
+
+    .code-container {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+
+    .referral-code {
+        font-size: 16px;
+        text-align: center;
+    }
+}

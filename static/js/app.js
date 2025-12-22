@@ -514,36 +514,142 @@ function loadSampleData(type) {
     }
 }
 
-// Referral Button
+// Enhanced Referral System
 function setupReferralButton() {
-    const referralBtn = document.querySelector('.btn-referral');
+    const generateReferralBtn = document.getElementById('generateReferralBtn');
+    const copyCodeBtn = document.getElementById('copyCodeBtn');
+    const emailInviteBtn = document.getElementById('emailInviteBtn');
 
-    if (referralBtn) {
-        referralBtn.addEventListener('click', () => {
-            if (isAuthenticated) {
-                // Generate and show referral link
-                const user = JSON.parse(localStorage.getItem('velvet_user') || '{}');
-                const refCode = btoa(user.email || 'demo').slice(0, 8);
-                const refLink = `${window.location.origin}?ref=${refCode}`;
-
-                // Copy to clipboard
-                navigator.clipboard.writeText(refLink).then(() => {
-                    referralBtn.textContent = 'Link Copied!';
-                    setTimeout(() => {
-                        referralBtn.textContent = 'Get Your Referral Link';
-                    }, 2000);
-                }).catch(() => {
-                    prompt('Copy your referral link:', refLink);
-                });
-            } else {
-                // Show auth modal for signup
+    if (generateReferralBtn) {
+        generateReferralBtn.addEventListener('click', async () => {
+            if (!isAuthenticated) {
                 showAuthModal();
-                // Switch to signup tab
                 const signupTab = document.querySelector('.auth-tab[data-tab="signup"]');
                 if (signupTab) signupTab.click();
+                return;
+            }
+
+            try {
+                // Generate referral code via API
+                const response = await apiCall('/api/referral/generate', {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    displayReferralCode(data.referral_code);
+                } else {
+                    // Fallback to client-side generation
+                    const user = JSON.parse(localStorage.getItem('velvet_user') || '{}');
+                    const userId = user.id || Math.random().toString(36).substr(2, 5);
+                    const refCode = `VR-${userId.toString().substring(0,3).toUpperCase()}${Math.floor(Math.random() * 1000)}`;
+                    displayReferralCode(refCode);
+                }
+            } catch (error) {
+                console.error('Error generating referral code:', error);
+                // Fallback generation
+                const refCode = `VR-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+                displayReferralCode(refCode);
             }
         });
     }
+
+    if (copyCodeBtn) {
+        copyCodeBtn.addEventListener('click', () => {
+            const referralCode = document.getElementById('referralCode').textContent;
+            const refLink = `${window.location.origin}?ref=${referralCode}`;
+
+            navigator.clipboard.writeText(refLink).then(() => {
+                copyCodeBtn.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyCodeBtn.textContent = 'Copy';
+                }, 2000);
+            }).catch(() => {
+                prompt('Copy your referral link:', refLink);
+            });
+        });
+    }
+
+    if (emailInviteBtn) {
+        emailInviteBtn.addEventListener('click', async () => {
+            if (!isAuthenticated) {
+                showAuthModal();
+                return;
+            }
+
+            const inviteEmail = document.getElementById('inviteEmail').value.trim();
+            if (!inviteEmail) {
+                showInviteStatus('Please enter a valid email address', 'error');
+                return;
+            }
+
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(inviteEmail)) {
+                showInviteStatus('Please enter a valid email address', 'error');
+                return;
+            }
+
+            try {
+                emailInviteBtn.disabled = true;
+                emailInviteBtn.innerHTML = `
+                    <svg class="spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" stroke-opacity="0.25"/>
+                        <path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/>
+                    </svg>
+                    Sending...
+                `;
+
+                const response = await apiCall('/api/referral/invite', {
+                    method: 'POST',
+                    body: { email: inviteEmail }
+                });
+
+                if (response.ok) {
+                    showInviteStatus('Invitation sent successfully!', 'success');
+                    document.getElementById('inviteEmail').value = '';
+                } else {
+                    const data = await response.json();
+                    showInviteStatus(data.detail || 'Failed to send invitation', 'error');
+                }
+            } catch (error) {
+                console.error('Error sending invitation:', error);
+                showInviteStatus('Failed to send invitation. Please try again.', 'error');
+            } finally {
+                emailInviteBtn.disabled = false;
+                emailInviteBtn.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                        <polyline points="22,6 12,13 2,6"/>
+                    </svg>
+                    Send Invitation
+                `;
+            }
+        });
+    }
+}
+
+function displayReferralCode(code) {
+    document.getElementById('referralCode').textContent = code;
+    document.getElementById('referralCodeDisplay').style.display = 'block';
+
+    // Scroll to the code display
+    document.getElementById('referralCodeDisplay').scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest'
+    });
+}
+
+function showInviteStatus(message, type) {
+    const statusDiv = document.getElementById('inviteStatus');
+    statusDiv.textContent = message;
+    statusDiv.className = `invite-status ${type}`;
+    statusDiv.style.display = 'block';
+
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+        statusDiv.style.display = 'none';
+    }, 5000);
 }
 
 // Add spinner CSS

@@ -23,7 +23,10 @@ from database import (
     init_db, get_db,
     create_user, get_user_by_email, get_user_by_id,
     create_upload, get_upload,
-    create_job, update_job_status, get_job, get_user_jobs
+    create_job, update_job_status, get_job, get_user_jobs,
+    get_user_tokens, add_tokens, consume_tokens, get_token_transactions,
+    create_referral, get_referral_by_code, get_user_referral_code,
+    record_referral_signup, award_referral_tokens, send_referral_invitation
 )
 from services.auth import (
     UserCreate, UserLogin, UserResponse, TokenResponse,
@@ -441,6 +444,179 @@ async def regenerate_report(
         )
 
         return {"job_id": new_job_id, "status": "processing"}
+
+
+# ============================================================================
+# Token Management Endpoints
+# ============================================================================
+
+from services.token_manager import TokenManager
+
+
+class TokenBalanceResponse(BaseModel):
+    balance: int
+    total_purchased: int
+    transactions: List[dict]
+
+
+class PurchaseRequest(BaseModel):
+    package: str
+    payment_id: Optional[str] = None
+
+
+class PurchaseResponse(BaseModel):
+    success: bool
+    tokens_added: int
+    new_balance: int
+    package: str
+    price_paid: int
+
+
+@app.get("/api/tokens/balance", response_model=TokenBalanceResponse)
+async def get_token_balance(current_user: dict = Depends(get_current_user)):
+    """Get user's token balance and transaction history."""
+    async for db in get_db():
+        balance_data = await TokenManager.get_user_balance(db, current_user["id"])
+        return TokenBalanceResponse(**balance_data)
+
+
+@app.get("/api/tokens/estimate")
+async def estimate_project_cost(complexity: str = "standard"):
+    """Estimate token cost for a project."""
+    estimate = await TokenManager.estimate_project_cost(complexity)
+    return estimate
+
+
+@app.post("/api/tokens/purchase", response_model=PurchaseResponse)
+async def purchase_tokens(
+    request: PurchaseRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Purchase token package."""
+    async for db in get_db():
+        try:
+            result = await TokenManager.purchase_tokens(
+                db, current_user["id"], request.package, request.payment_id
+            )
+            return PurchaseResponse(**result)
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/api/tokens/recommendations")
+async def get_token_recommendations(current_user: dict = Depends(get_current_user)):
+    """Get token package recommendations."""
+    async for db in get_db():
+        balance_data = await TokenManager.get_user_balance(db, current_user["id"])
+        recommendations = TokenManager.get_package_recommendations(balance_data["balance"])
+        return {"current_balance": balance_data["balance"], "recommendations": recommendations}
+
+
+# ============================================================================
+# Referral System Endpoints
+# ============================================================================
+
+from services.referral_manager import ReferralManager
+
+
+class ReferralCodeResponse(BaseModel):
+    referral_code: str
+    invitation_link: str
+
+
+class InviteRequest(BaseModel):
+    email: str
+
+
+class InviteResponse(BaseModel):
+    success: bool
+    message: str
+    referral_code: Optional[str] = None
+    invitation_link: Optional[str] = None
+
+
+@app.post("/api/referral/generate", response_model=ReferralCodeResponse)
+async def generate_referral_code(current_user: dict = Depends(get_current_user)):
+    """Generate or get existing referral code."""
+    async for db in get_db():
+        referral_code = await ReferralManager.get_or_create_referral_code(db, current_user["id"])
+        invitation_link = ReferralManager.format_referral_link(referral_code)
+
+        return ReferralCodeResponse(
+            referral_code=referral_code,
+            invitation_link=invitation_link
+        )
+
+
+@app.post("/api/referral/invite", response_model=InviteResponse)
+async def send_referral_invitation(
+    request: InviteRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Send referral invitation via email."""
+    async for db in get_db():
+        result = await ReferralManager.send_invitation(db, current_user["id"], request.email)
+        return InviteResponse(**result)
+
+
+@app.get("/api/referral/validate")
+async def validate_referral_code(ref: str):
+    """Validate a referral code."""
+    async for db in get_db():
+        validation = await ReferralManager.validate_referral_code(db, ref)
+        return validation
+
+
+@app.get("/api/referral/stats")
+async def get_referral_stats(current_user: dict = Depends(get_current_user)):
+    """Get user's referral statistics."""
+    async for db in get_db():
+        stats = await ReferralManager.get_referral_stats(db, current_user["id"])
+        return stats
+
+
+# ============================================================================
+# Enhanced Registration with Referral Support
+# ============================================================================
+
+class UserCreateWithReferral(UserCreate):
+    referral_code: Optional[str] = None
+
+
+@app.post("/api/auth/register_with_referral", response_model=TokenResponse)
+async def register_with_referral(user: UserCreateWithReferral):
+    """Register new user with optional referral code."""
+    async for db in get_db():
+        # Check if user exists
+        existing = await get_user_by_email(db, user.email)
+        if existing:
+            raise HTTPException(status_code=400, detail="Email already registered")
+
+        # Validate referral code if provided
+        referral_valid = False
+        if user.referral_code:
+            validation = await ReferralManager.validate_referral_code(db, user.referral_code)
+            referral_valid = validation["valid"]
+            if not referral_valid:
+                raise HTTPException(status_code=400, detail="Invalid referral code")
+
+        # Create user
+        user_id = generate_user_id()
+        password_hash = hash_password(user.password)
+        await create_user(db, user_id, user.email, password_hash)
+
+        # Process referral if valid
+        if referral_valid and user.referral_code:
+            await ReferralManager.process_referral_signup(db, user.referral_code, user_id)
+
+        # Create access token
+        access_token = create_access_token({"sub": user.email})
+
+        return TokenResponse(
+            access_token=access_token,
+            token_type="bearer",
+            user=UserResponse(id=user_id, email=user.email)
+        )
 
 
 # ============================================================================
